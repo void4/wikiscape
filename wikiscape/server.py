@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from flask import Flask, request, send_from_directory, send_file
+from flask import Flask, request, send_from_directory, send_file, abort
 
 from quad import namequery
 from dynamic import generateTile
@@ -13,7 +13,13 @@ def send_tiles(path):
 	#return send_from_directory('tiles', path)
 	coords = path.split(".")[0]
 	coords = [int(c) for c in coords.split("-")]
-	tile = generateTile(*coords)
+
+	z, x, y = coords
+
+	if not ((8 < z < 15) and (0 < x < 2**z) and (0 < y < 2**z)):
+		abort(404)
+
+	tile = generateTile(z, x, y)
 
 	bio = BytesIO()
 	tile.save(bio, "png")
