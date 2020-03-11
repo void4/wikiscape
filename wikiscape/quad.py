@@ -2,9 +2,9 @@ import csv
 
 from scipy.spatial import KDTree, cKDTree
 
-csvfile = open("largeout.gdf", newline="")
+csvfile = open("extended.csv", newline="")
 
-reader = csv.reader(csvfile, delimiter=",", quotechar='"')
+reader = csv.reader(csvfile, delimiter="\t", quotechar='"')
 
 next(reader, None)
 
@@ -25,14 +25,14 @@ for ri, row in enumerate(reader):
 	try:
 		x = float(row[2])
 		y = float(row[3])
-	except IndexError:
+	except (IndexError, ValueError):
 		print(row)
 		exit(1)
 	x = (x-minx)/(maxx-minx)*(w-1)
 	y = (y-miny)/(maxy-miny)*(h-1)
 
-	x = int(x)
-	y = int(y)
+	#x = int(x)
+	#y = int(y)
 
 	key = (x,y)
 	data[key] = row[1]

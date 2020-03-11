@@ -36,7 +36,7 @@ i.readline()
 with open("extended.csv", "w+") as f:
 	for line in i:
 		line = line.split()
-		label = names[int(line[0])]
+		label = names[int(line[0])].replace("\t", "")
 		f.write(f"{line[0]}\t{label}\t{line[1]}\t{line[2]}\t{indegree[line[0]]}\n")
 
 f.close()
