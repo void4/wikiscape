@@ -1,13 +1,25 @@
+from io import BytesIO
+
 from flask import Flask, request, send_from_directory, send_file
 
 from quad import namequery
+from dynamic import generateTile
 
 app = Flask(__name__, static_url_path='')
 
 # keep this for local dev
 @app.route('/tiles/<path:path>')
 def send_tiles(path):
-	return send_from_directory('tiles', path)
+	#return send_from_directory('tiles', path)
+	coords = path.split(".")[0]
+	coords = [int(c) for c in coords.split("-")]
+	tile = generateTile(*coords)
+
+	bio = BytesIO()
+	tile.save(bio, "png")
+	bio.seek(0)
+	# Also cache in nginx data root?
+	return send_file(bio, mimetype="image/png")
 
 @app.route('/js/<path:path>')
 def send_js(path):
