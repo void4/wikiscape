@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/polymaps.js"></script>
+    <style type="text/css">
+
+@import url("css/example.css");
+
+.compass .chevron, .compass .fore {
+  stroke: #666;
+}
+
+#map {
+  background: #333333;
+}
+
+#logo {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+#copy {
+  bottom: 0;
+  padding: 10px;
+  font: 10px sans-serif;
+  background: #fff;
+  color: #666;
+}
+
+#copy a {
+  font-weight: bold;
+  color: #666;
+}
+
+    </style>
+  </head>
+  <body id="map">
+    <script type="text/javascript" src="js/map.js"></script>
+    <span id="copy">
+      Created by
+      <a href="https://void4.github.io">void4</a>.
+    </span>
+    <img id="logo"/>
+  </body>
+</html>
