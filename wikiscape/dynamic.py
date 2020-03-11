@@ -20,18 +20,18 @@ def generateTile(zoom, x, y):
     tx = x*tw
     ty = y*th
 
-    print(tx, ty, tw, th, tr)
+    #print(tx, ty, tw, th, tr)
     points = tree.query_ball_point([(tx+tw/2, ty+th/2)], tr)[0]
 
     tile = Image.new("RGB", (256, 256))
 
     for index in points:
         px, py = keylist[index]
-        print(px, py)
+        #print(px, py)
         if (tx <= px < tx+tw) and (ty <= py < ty+th):
             rx = (px-tx)*(zoomFactor/2**7)
             ry = (py-ty)*(zoomFactor/2**7)
-            print("R", rx, ry)
+            #print("R", rx, ry)
             #print(px, py)
             tile.putpixel((int(rx), int(ry)), (128,128,128))
 
