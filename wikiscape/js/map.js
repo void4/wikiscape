@@ -17,7 +17,7 @@ var layer = po.image().url(getTile);
 
 var map = po.map()
     .container(div.appendChild(po.svg("svg")))
-    .zoomRange([0,8])
+    .zoomRange([0,11])
     .zoom(1)
     .add(layer);
           //.tileSize({x: 256, y: 256});
