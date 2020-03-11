@@ -2,7 +2,8 @@ import csv
 
 from scipy.spatial import KDTree, cKDTree
 
-csvfile = open("extended.csv", newline="")
+CSVPATH = "extended.csv"
+csvfile = open(CSVPATH, newline="")
 
 reader = csv.reader(csvfile, delimiter="\t", quotechar='"')
 
@@ -16,6 +17,11 @@ miny = -52.315582
 maxy = 63.880695
 
 w = h = 2**15
+
+keylist = []
+valuelist = []
+
+print(f"Loading {CSVPATH}...")
 
 for ri, row in enumerate(reader):
 
@@ -35,12 +41,14 @@ for ri, row in enumerate(reader):
 	#y = int(y)
 
 	key = (x,y)
-	data[key] = row[1]
+	keylist.append(key)
+	valuelist.append(row[1])
 
-tree = cKDTree(list(data.keys()))
+print(f"Loaded {CSVPATH}.")
 
-keylist = list(data.keys())
-valuelist = list(data.values())
+print("Constructing scipy.spatial.cKDTree...")
+tree = cKDTree(keylist)
+print("Quadtree constructed.")
 
 def namequery(x,y):
 	distances, indices = tree.query([[x,y]])
