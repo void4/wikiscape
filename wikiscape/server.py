@@ -16,7 +16,7 @@ def send_tiles(path):
 
 	z, x, y = coords
 
-	if not ((8 < z < 15) and (0 < x < 2**z) and (0 < y < 2**z)):
+	if not ((8 < z < 15) and (0 < x < 2**z) and (0 < y < 2**z)):#XXX z-1?
 		abort(404)
 
 	tile = generateTile(z, x, y)
@@ -24,6 +24,12 @@ def send_tiles(path):
 	bio = BytesIO()
 	tile.save(bio, "png")
 	bio.seek(0)
+
+	# Don't send image, send data instead
+	
+	#if z == 9:
+	#	tile.save(f"/var/www/tiles/{z}-{x}-{y}.png")
+
 	# Also cache in nginx data root?
 	return send_file(bio, mimetype="image/png")
 

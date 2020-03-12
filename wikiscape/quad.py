@@ -1,54 +1,72 @@
 import csv
+import pickle
 
 from scipy.spatial import KDTree, cKDTree
 
+LOADTREE = False
+
 CSVPATH = "extended.csv"
-csvfile = open(CSVPATH, newline="")
+TREEPATH = "tree.pickle"
 
-reader = csv.reader(csvfile, delimiter="\t", quotechar='"')
+if LOADTREE:
+	print("Loading data...")
+	keylist, valuelist, scalelist, tree = pickle.loads(open(TREEPATH, "rb").read())
+else:
+	csvfile = open(CSVPATH, newline="")
 
-next(reader, None)
+	reader = csv.reader(csvfile, delimiter="\t", quotechar='"')
 
-data = {}
+	next(reader, None)
 
-minx = -52.368118
-maxx = 56.263245
-miny = -52.315582
-maxy = 63.880695
+	data = {}
 
-w = h = 2**15
+	minx = -52.368118
+	maxx = 56.263245
+	miny = -52.315582
+	maxy = 63.880695
 
-keylist = []
-valuelist = []
+	w = h = 2**15
 
-print(f"Loading {CSVPATH}...")
+	keylist = []
+	valuelist = []
+	scalelist = []
 
-for ri, row in enumerate(reader):
+	print(f"Loading {CSVPATH}...")
 
-	if ri%1000000 == 0:
-		print(ri)
+	for ri, row in enumerate(reader):
 
-	try:
-		x = float(row[2])
-		y = float(row[3])
-	except (IndexError, ValueError):
-		print(row)
-		exit(1)
-	x = (x-minx)/(maxx-minx)*(w-1)
-	y = (y-miny)/(maxy-miny)*(h-1)
+		if ri%1000000 == 0:
+			print(ri)
 
-	#x = int(x)
-	#y = int(y)
+		try:
+			x = float(row[2])
+			y = float(row[3])
+		except (IndexError, ValueError):
+			print(row)
+			exit(1)
+		x = (x-minx)/(maxx-minx)*(w-1)
+		y = (y-miny)/(maxy-miny)*(h-1)
 
-	key = (x,y)
-	keylist.append(key)
-	valuelist.append(row[1])
+		#x = int(x)
+		#y = int(y)
 
-print(f"Loaded {CSVPATH}.")
+		key = (x,y)
+		keylist.append(key)
+		valuelist.append(row[1])
+		scalelist.append(float(row[4]))
 
-print("Constructing scipy.spatial.cKDTree...")
-tree = cKDTree(keylist)
-print("Quadtree constructed.")
+	print(f"Loaded {CSVPATH}.")
+
+	print("Constructing scipy.spatial.cKDTree...")
+	tree = cKDTree(keylist)
+	print("Quadtree constructed.")
+
+	"""
+	with open(TREEPATH, "wb+") as treefile:
+		treefile.write(pickle.dumps([keylist, valuelist, scalelist, tree]))
+
+	print("Data saved.")
+	"""
 
 def namequery(x,y):
 	distances, indices = tree.query([[x,y]])

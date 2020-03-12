@@ -41,11 +41,12 @@ def generateTile(zoom, x, y):
             #print("R", rx, ry)
             #print(px, py)
             point = (int(rx), int(ry))
-            #tile.putpixel(point, (128,128,128))
-            draw.ellipse([int(rx-scale), int(ry-scale), int(rx+scale), int(ry+scale)], fill=(200,200,200))
 
             if zoom >= 14:
+                draw.ellipse([int(rx-scale), int(ry-scale), int(rx+scale), int(ry+scale)], fill=(200,200,200))
                 draw.text(point, valuelist[index], font=large(10))
+            else:
+                tile.putpixel(point, (200,200,200))
 
     tilefilename = f"{zoom}-{x}-{y}.png"
     print("Generated", tilefilename, len(points))
