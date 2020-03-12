@@ -3,12 +3,17 @@ from io import BytesIO
 from flask import Flask, request, send_from_directory, send_file, abort
 import flask_monitoringdashboard as dashboard
 
+print("Creating app...")
+app = Flask(__name__, static_url_path='')
+
+print("Loading dashboard...")
+dashboard.config.init_from(file="dashboard.cfg")
+print("Binding...")
+dashboard.bind(app)
+print("Done.")
+
 from quad import namequery
 from dynamic import generateTile
-
-app = Flask(__name__, static_url_path='')
-dashboard.config.init_from(file="dashboard.cfg")
-dashboard.bind(app)
 
 # keep this for local dev
 @app.route('/tiles/<path:path>')
@@ -59,4 +64,5 @@ def root():
 	return send_file('map.html')
 
 if __name__ == "__main__":
+	print("Starting server...")
 	app.run()
