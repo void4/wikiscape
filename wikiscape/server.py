@@ -1,11 +1,14 @@
 from io import BytesIO
 
 from flask import Flask, request, send_from_directory, send_file, abort
+import flask_monitoringdashboard as dashboard
 
 from quad import namequery
 from dynamic import generateTile
 
 app = Flask(__name__, static_url_path='')
+dashboard.config.init_from(file="dashboard.cfg")
+dashboard.bind(app)
 
 # keep this for local dev
 @app.route('/tiles/<path:path>')
@@ -26,7 +29,7 @@ def send_tiles(path):
 	bio.seek(0)
 
 	# Don't send image, send data instead
-	
+
 	#if z == 9:
 	#	tile.save(f"/var/www/tiles/{z}-{x}-{y}.png")
 
