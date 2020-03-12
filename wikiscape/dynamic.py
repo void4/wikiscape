@@ -1,3 +1,4 @@
+import os
 from math import log
 
 from PIL import Image, ImageDraw, ImageFont
@@ -9,47 +10,64 @@ from fonts import large
 ow = oh = 2**15
 #Generate closer tiles dynamically?
 
+TILEPATH = "l910"
+os.makedirs(TILEPATH, exist_ok=True)
+
 def generateTile(zoom, x, y):
 
-    # Tile width and height, dependent on zoom level
-    zoomFactor = 2**(zoom-1)
-    tw = ow/zoomFactor
-    th = oh/zoomFactor
+	# Tile width and height, dependent on zoom level
+	zoomFactor = 2**(zoom-1)
+	tw = ow/zoomFactor
+	th = oh/zoomFactor
 
-    # Tile radius
-    tr = (tw**2 + th**2)**0.5
+	# Tile radius
+	tr = (tw**2 + th**2)**0.5
 
-    tx = x*tw
-    ty = y*th
+	tx = x*tw
+	ty = y*th
 
-    #print(tx, ty, tw, th, tr)
-    points = tree.query_ball_point([(tx+tw/2, ty+th/2)], tr)[0]
+	#print(tx, ty, tw, th, tr)
+	points = tree.query_ball_point([(tx+tw/2, ty+th/2)], tr)[0]
 
-    tile = Image.new("RGB", (256, 256))
-    draw = ImageDraw.Draw(tile)
+	tilefilename = f"{zoom}-{x}-{y}.png"
+	tilepath = os.path.join(TILEPATH, tilefilename)
+	"""
+	if len(points) == 0:
+		os.system(f"cp black.png {tilepath}")
+		print("Generated", tilefilename, len(points))
+		return None#XXX return black.png
+	"""
 
-    for index in points:
-        px, py = keylist[index]
-        #print(px, py)
-        if (tx <= px < tx+tw) and (ty <= py < ty+th):
-            rx = (px-tx)*(zoomFactor/2**7)
-            ry = (py-ty)*(zoomFactor/2**7)
 
-            scale = scalelist[index]
-            scale = 5*log(1+scale, 10)
-            #scale = max(0, scale)
-            #print("R", rx, ry)
-            #print(px, py)
-            point = (int(rx), int(ry))
+	tile = Image.new("RGB", (256, 256))
+	draw = ImageDraw.Draw(tile)
 
-            if zoom >= 14:
-                draw.ellipse([int(rx-scale), int(ry-scale), int(rx+scale), int(ry+scale)], fill=(200,200,200))
-                draw.text(point, valuelist[index], font=large(10))
-            else:
-                tile.putpixel(point, (200,200,200))
+	for index in points:
+		px, py = keylist[index]
+		#print(px, py)
+		if (tx <= px < tx+tw) and (ty <= py < ty+th):
+			rx = (px-tx)*(zoomFactor/2**7)
+			ry = (py-ty)*(zoomFactor/2**7)
 
-    tilefilename = f"{zoom}-{x}-{y}.png"
-    print("Generated", tilefilename, len(points))
-    #tilepath = os.path.join(TILEPATH, tilefilename)
-    #tile.save(tilepath)
-    return tile
+			scale = scalelist[index]
+			scale = 5*log(1+scale, 10)
+			#scale = max(0, scale)
+			#print("R", rx, ry)
+			#print(px, py)
+			point = (int(rx), int(ry))
+
+			if zoom >= 14:
+				draw.ellipse([int(rx-scale), int(ry-scale), int(rx+scale), int(ry+scale)], fill=(200,200,200))
+				draw.text(point, valuelist[index], font=large(10))
+			else:
+				tile.putpixel(point, (200,200,200))
+
+	print("Generated", tilefilename, len(points))
+	tile.save(tilepath)
+	return tile
+
+if __name__ == "__main__":
+	for z in range(10, 11):
+		for x in range(2**(z-1)):
+			for y in range(2**(z-1)):
+				generateTile(z, x, y)
