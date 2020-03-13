@@ -12,7 +12,7 @@ print("Binding...")
 dashboard.bind(app)
 print("Done.")
 
-from quad import namequery
+from quad import namequery, namesearch
 from dynamic import generateTile
 
 # keep this for local dev
@@ -58,6 +58,12 @@ def getmouse():
 	y = float(y)
 
 	return namequery(x, y)
+
+@app.route("/search")
+def search():
+	title = request.args.get("search")
+	coords = namesearch(title)
+	return str(coords)
 
 @app.route('/')
 def root():

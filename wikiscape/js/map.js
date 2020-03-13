@@ -41,6 +41,9 @@ $(div).mousedown(function(e) {
   lastmouse = e;
 });
 
+var originalWidth = 32768;
+var originalHeight = 32768;
+
 $(div).mouseup(function(e) {
 
   // prevent drag actions from opening links
@@ -56,9 +59,6 @@ $(div).mouseup(function(e) {
     var y01 = crz.row/zoomMultiplier;
 
     // Multiply with the original image width and height
-    var originalWidth = 32768;
-    var originalHeight = 32768;
-
     var mx = x01*originalWidth;
     var my = y01*originalHeight;
 
@@ -80,7 +80,25 @@ $(div).mouseup(function(e) {
 
 });
 
-$(div).mousemove(function(e) {
+function xy2coords(x, y, z) {
+  var x01 = x/originalWidth;
+  var y01 = y/originalHeight;
 
+  var zoomMultiplier = Math.pow(2, z-1);
 
+  var column = x01*zoomMultiplier;
+  var row = y01*zoomMultiplier;
+
+  var point = map.locationPoint(map.coordinateLocation({column, row}));
+
+  return point;
+}
+
+$("#searchsubmit").click(function() {
+  console.log("Click")
+  $.get("/search", {"search": $("#searchinput").val()}, function(data) {
+    console.log(data)
+    map.center(xy2coords(data.x, data.y, data.z));
+    map.zoom(data.z);
+  })
 })

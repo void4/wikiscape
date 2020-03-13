@@ -71,6 +71,23 @@ else:
 def namequery(x,y):
 	distances, indices = tree.query([[x,y]])
 	return valuelist[indices[0]]
+
+
+def namesearch(title):
+	candidates = []
+	for vi, v in enumerate(valuelist):
+		if title in v:
+			candidates.append([title, vi])
+
+	if len(candidates) == 0:
+		return {}
+
+	c0 = candidates[0]
+	x, y = keylist[c0[1]]
+	z = 14
+	k = 2**(z-1)
+	return {"x":x/k, "y":y/k, "z":z}
+
 """
 print(tree.query([1000,1000]))
 """
