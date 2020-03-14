@@ -65,6 +65,8 @@ $(div).mouseup(function(e) {
     // Now we have the mouse coordinates on the original image!
     //console.log(mx, my);
 
+	console.log(mx, my);
+
     $.get("/getmouse", {x:mx, y:my}, function(data) {
       console.log(data)
       var win = window.open('https://en.wikipedia.org/wiki/'+data, '_blank');
@@ -89,16 +91,22 @@ function xy2coords(x, y, z) {
   var column = x01*zoomMultiplier;
   var row = y01*zoomMultiplier;
 
-  var point = map.locationPoint(map.coordinateLocation({column, row}));
+  //console.log(column, row);
 
-  return point;
+  var cl = map.coordinateLocation({column, row, zoom:z});
+  //console.log(cl);
+  //var point = map.locationPoint(cl);
+
+  return cl;
 }
 
 $("#searchsubmit").click(function() {
-  console.log("Click")
+  //console.log("Click")
   $.get("/search", {"search": $("#searchinput").val()}, function(data) {
-    console.log(data)
-    map.center(xy2coords(data.x, data.y, data.z));
+    //console.log(data)
+    var latlon = xy2coords(data.x, data.y, data.z);
+    //console.log(latlon);
+    map.center(latlon);
     map.zoom(data.z);
   })
 })
