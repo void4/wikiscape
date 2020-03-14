@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from flask import Flask, request, send_from_directory, send_file, abort
+from flask import Flask, request, send_from_directory, send_file, abort, jsonify
 import flask_monitoringdashboard as dashboard
 
 print("Creating app...")
@@ -12,7 +12,7 @@ print("Binding...")
 dashboard.bind(app)
 print("Done.")
 
-from quad import namequery, namesearch
+from quad import namequery, namesearch, termsuggest
 from dynamic import generateTile
 
 # keep this for local dev
@@ -57,13 +57,28 @@ def getmouse():
 	x = float(x)
 	y = float(y)
 
+	print(x, y)
+
 	return namequery(x, y)
 
 @app.route("/search")
 def search():
 	title = request.args.get("search")
 	coords = namesearch(title)
-	return str(coords)
+
+	print(coords)
+	return jsonify(coords)
+
+@app.route("/suggest")
+def suggest():
+	term = request.args.get("term")
+
+	suggestions = termsuggest(term)
+
+	# Only return page names, not size
+	suggestions = [item[0] for item in suggestions]
+
+	return jsonify(suggestions)#str([])#str(coords)
 
 @app.route('/')
 def root():

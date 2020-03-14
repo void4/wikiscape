@@ -72,18 +72,39 @@ def namequery(x,y):
 	distances, indices = tree.query([[x,y]])
 	return valuelist[indices[0]]
 
+import datrie
+import string
+
+print("Constructing search trie...")
+trie = datrie.Trie(string.ascii_lowercase)
+
+for vi, v in enumerate(valuelist):
+	trie[v] = vi
+
+print("Trie constructed.")
+
+
+def termsuggest(term):
+
+	# Search trie for term prefix
+	suggestions = trie.items(term)
+
+	# Sort suggestions by number of links, decreasing
+	suggestions = sorted(suggestions, key=lambda item:scalelist[item[1]], reverse=True)
+
+
+	return suggestions
+
 
 def namesearch(title):
-	candidates = []
-	for vi, v in enumerate(valuelist):
-		if title in v:
-			candidates.append([title, vi])
+	suggestions = termsuggest(title)
 
-	if len(candidates) == 0:
+	if len(suggestions) == 0:
 		return {}
 
-	c0 = candidates[0]
-	x, y = keylist[c0[1]]
+	closest = suggestions[0]
+
+	x, y = keylist[closest[1]]
 	z = 14
 	k = 2**(z-1)
 	return {"x":x/k, "y":y/k, "z":z}

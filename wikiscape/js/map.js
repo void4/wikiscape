@@ -102,3 +102,10 @@ $("#searchsubmit").click(function() {
     map.zoom(data.z);
   })
 })
+
+$("#searchinput").autocomplete({
+  minLength: 3,
+  appendTo: $("#appendto"),
+  position: { my: "left bottom", at: "left top", collision: "flip" },
+  source: "/suggest"
+})
