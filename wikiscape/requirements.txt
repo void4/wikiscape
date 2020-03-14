@@ -2,3 +2,4 @@ uwsgi
 flask
 scipy
 flask_monitoringdashboard
+datrie
