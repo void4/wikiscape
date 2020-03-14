@@ -5,6 +5,9 @@ from scipy.spatial import KDTree, cKDTree
 
 LOADTREE = False
 
+LOADTRIE = False
+SAVETRIE = True
+
 CSVPATH = "extended.csv"
 TREEPATH = "tree.pickle"
 
@@ -75,14 +78,28 @@ def namequery(x,y):
 import datrie
 import string
 
-print("Constructing search trie...")
-trie = datrie.Trie(string.ascii_lowercase)
+if LOADTRIE:
+	print("Loading search trie...")
 
-for vi, v in enumerate(valuelist):
-	trie[v] = vi
+	with open(TRIEFILE, "rb") as triefile:
+		trie = pickle.loads(triefile.read())
+	
+	print("Trie loaded.")
+else:
+	print("Constructing search trie...")
+	trie = datrie.Trie(string.ascii_lowercase)
 
-print("Trie constructed.")
+	for vi, v in enumerate(valuelist):
+		trie[v] = vi
 
+	print("Trie constructed.")
+
+	if SAVETRIE:
+		print("Saving trie...")
+		with open(TRIEFILE, "wb+") as triefile:
+			triefile.write(pickle.dumps(trie))
+
+		print("Trie saved.")
 
 def termsuggest(term):
 
@@ -105,9 +122,12 @@ def namesearch(title):
 	closest = suggestions[0]
 
 	x, y = keylist[closest[1]]
+	
 	z = 14
-	k = 2**(z-1)
-	return {"x":x/k, "y":y/k, "z":z}
+	
+	#k = 2**(z-1)
+	#return {"x":x/k, "y":y/k, "z":z}
+	return {"x": x, "y":y, "z":z}
 
 """
 print(tree.query([1000,1000]))
