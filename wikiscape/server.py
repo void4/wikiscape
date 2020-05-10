@@ -13,14 +13,18 @@ dashboard.bind(app)
 print("Done.")
 
 from quad import namequery, namesearch, termsuggest
-from dynamic import generateTile
+from dynamic import generateTile, generateMeta
 
 # keep this for local dev
 @app.route('/tiles/<path:path>')
 def send_tiles(path):
 	#return send_from_directory('tiles', path)
-	coords = path.split(".")[0]
-	coords = [int(c) for c in coords.split("-")]
+
+	try:
+		coords = path.split(".")[0]
+		coords = [int(c) for c in coords.split("|")]
+	except ValueError:
+		abort(404)
 
 	z, x, y = coords
 
@@ -40,6 +44,22 @@ def send_tiles(path):
 
 	# Also cache in nginx data root?
 	return send_file(bio, mimetype="image/png")
+
+@app.route('/tilemeta/<path:path>')
+def sent_tilemeta(path):
+
+	try:
+		coords = [int(c) for c in path.split("|")]
+	except ValueError:
+		abort(404)
+
+	z, x, y = coords
+
+	if not ((8 < z < 15) and (0 < x < 2**(z-1)) and (0 < y < 2**(z-1))):#XXX z-1?
+		abort(404)
+
+	return jsonify(generateMeta(z, x, y))
+
 
 @app.route('/js/<path:path>')
 def send_js(path):

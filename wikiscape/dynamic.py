@@ -10,11 +10,13 @@ from fonts import large
 ow = oh = 2**15
 #Generate closer tiles dynamically?
 
-TILEPATH = "l910"
+TILEPATH = "l12"
 os.makedirs(TILEPATH, exist_ok=True)
 
-def generateTile(zoom, x, y):
+black = Image.new("RGB", (256, 256))
 
+
+def tileCoords(zoom, x, y):
 	# Tile width and height, dependent on zoom level
 	zoomFactor = 2**(zoom-1)
 	tw = ow/zoomFactor
@@ -26,18 +28,40 @@ def generateTile(zoom, x, y):
 	tx = x*tw
 	ty = y*th
 
+	return zoomFactor,tw,th,tr,tx,ty
+
+def generateMeta(zoom, x, y):
+	#[{"text":"test", "value":[0,0]}]
+	zoomFactor,tw,th,tr,tx,ty = tileCoords(zoom, x, y)
+
+	points = tree.query_ball_point([(tx+tw/2, ty+th/2)], tr)[0]
+
+	meta = []
+
+	for index in points:
+		scale = scalelist[index]
+		if scale > 10:
+			meta.append({"text":valuelist[index], "value":keylist[index], "scale":scale})
+
+	return meta
+
+def generateTile(zoom, x, y):
+
+	zoomFactor,tw,th,tr,tx,ty = tileCoords(zoom, x, y)
+
 	#print(tx, ty, tw, th, tr)
 	points = tree.query_ball_point([(tx+tw/2, ty+th/2)], tr)[0]
 
+
 	tilefilename = f"{zoom}-{x}-{y}.png"
-	tilepath = os.path.join(TILEPATH, tilefilename)
 	"""
+	tilepath = os.path.join(TILEPATH, tilefilename)
+
 	if len(points) == 0:
-		os.system(f"cp black.png {tilepath}")
+		black.save(tilepath)
 		print("Generated", tilefilename, len(points))
 		return None#XXX return black.png
 	"""
-
 
 	tile = Image.new("RGB", (256, 256))
 	draw = ImageDraw.Draw(tile)
@@ -63,11 +87,11 @@ def generateTile(zoom, x, y):
 				tile.putpixel(point, (200,200,200))
 
 	print("Generated", tilefilename, len(points))
-	tile.save(tilepath)
+	#XXX save/cache tiles here anyway? not sure what is better, faster request or cached regions tile.save(tilepath)
 	return tile
 
 if __name__ == "__main__":
-	for z in range(10, 11):
-		for x in range(2**(z-1)):
+	for z in range(12, 13):
+		for x in range(1274, 2**(z-1)):
 			for y in range(2**(z-1)):
 				generateTile(z, x, y)
