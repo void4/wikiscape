@@ -98,7 +98,7 @@ $(div).mouseup(function(e) {
 
     var latlon = map.mouseEventToLatLng(e);
     console.log(latlon)
-    var coords = latlngToTilePixel(latlon, map.options.crs, map.getZoom(), tilesize, map.getPixelOrigin())
+    var coords = latlngToTilePixel(latlon, map.options.crs, map.getZoom()+1, tilesize, map.getPixelOrigin())
     var mx = (coords[0].x*tilesize+coords[1].x)/Math.pow(2, map.getZoom()-1)/256*originalWidth;
     var my = (coords[0].y*tilesize+coords[1].y)/Math.pow(2, map.getZoom()-1)/256*originalHeight;
 

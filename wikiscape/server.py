@@ -7,11 +7,13 @@ from settings import *
 print("Creating app...")
 app = Flask(__name__, static_url_path='')
 
+"""
 print("Loading dashboard...")
 dashboard.config.init_from(file="dashboard.cfg")
 print("Binding...")
 dashboard.bind(app)
 print("Done.")
+"""
 
 from quad import namequery, namesearch, termsuggest
 from dynamic import generateTile, generateMeta
@@ -34,7 +36,7 @@ def send_tiles(path):
 
 	z, x, y = coords
 
-	z += 1
+	#z += 1
 	#11
 	if not ((1 < z < 16) and (0 < x < 2**(z-1)) and (0 < y < 2**(z-1))):#XXX z-1?
 		abort(404)
