@@ -1,4 +1,4 @@
-var map = L.map('map').setView([45, -45], 12);
+var map = L.map('map').setView([79.4, -134.6], 4);
 
 L.tileLayer("tiles/{z}|{x}|{y}.png", {
   maxZoom: 16,
