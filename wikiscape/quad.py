@@ -5,11 +5,12 @@ from scipy.spatial import KDTree, cKDTree
 
 LOADTREE = False
 
-LOADTRIE = False
-SAVETRIE = True
+LOADTRIE = True
+SAVETRIE = False
 
 CSVPATH = "extended.csv"
 TREEPATH = "tree.pickle"
+TRIEPATH = "trie.pickle"
 
 if LOADTREE:
 	print("Loading data...")
@@ -81,7 +82,7 @@ import string
 if LOADTRIE:
 	print("Loading search trie...")
 
-	with open(TRIEFILE, "rb") as triefile:
+	with open(TRIEPATH, "rb") as triefile:
 		trie = pickle.loads(triefile.read())
 	
 	print("Trie loaded.")
@@ -90,13 +91,13 @@ else:
 	trie = datrie.Trie(string.ascii_lowercase)
 
 	for vi, v in enumerate(valuelist):
-		trie[v] = vi
+		trie[v.lower()] = vi
 
 	print("Trie constructed.")
 
 	if SAVETRIE:
 		print("Saving trie...")
-		with open(TRIEFILE, "wb+") as triefile:
+		with open(TRIEPATH, "wb+") as triefile:
 			triefile.write(pickle.dumps(trie))
 
 		print("Trie saved.")
