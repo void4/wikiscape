@@ -1,5 +1,7 @@
 var map = L.map('map').setView([79.4, -134.6], 4);
 
+var hash = new L.Hash(map);
+
 L.tileLayer("tiles/{z}|{x}|{y}.png", {
   maxZoom: 16,
   tileSize: 256,
