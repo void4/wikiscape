@@ -1,4 +1,4 @@
 import os
 
-TILECACHE = "tilecache"#"/var/www/tiles"#
+TILECACHE = "tiles"#"/var/www/tiles"#
 os.makedirs(TILECACHE, exist_ok=True)
