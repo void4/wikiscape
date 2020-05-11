@@ -2,6 +2,7 @@ from io import BytesIO
 
 from flask import Flask, request, send_from_directory, send_file, abort, jsonify
 import flask_monitoringdashboard as dashboard
+from settings import *
 
 print("Creating app...")
 app = Flask(__name__, static_url_path='')
@@ -18,7 +19,12 @@ from dynamic import generateTile, generateMeta
 # keep this for local dev
 @app.route('/tiles/<path:path>')
 def send_tiles(path):
-	#return send_from_directory('tiles', path)
+
+	# TODO nginx!
+	try:
+		return send_from_directory(TILECACHE, path)
+	except:
+		pass
 
 	try:
 		coords = path.split(".")[0]
@@ -28,7 +34,9 @@ def send_tiles(path):
 
 	z, x, y = coords
 
-	if not ((11 < z < 16) and (0 < x < 2**(z-1)) and (0 < y < 2**(z-1))):#XXX z-1?
+	z += 1
+	#11
+	if not ((1 < z < 16) and (0 < x < 2**(z-1)) and (0 < y < 2**(z-1))):#XXX z-1?
 		abort(404)
 
 	tile = generateTile(z, x, y)
@@ -55,7 +63,7 @@ def sent_tilemeta(path):
 
 	z, x, y = coords
 
-	if not ((8 < z < 15) and (0 < x < 2**(z-1)) and (0 < y < 2**(z-1))):#XXX z-1?
+	if not ((8 < z < 16) and (0 < x < 2**(z-1)) and (0 < y < 2**(z-1))):#XXX z-1?
 		abort(404)
 
 	return jsonify(generateMeta(z, x, y))

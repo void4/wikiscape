@@ -5,13 +5,14 @@ from PIL import Image, ImageDraw, ImageFont
 
 from quad import tree, keylist, valuelist, scalelist
 from fonts import large
+from settings import *
 
 # Original image width and height (coordinate bounds)
 ow = oh = 2**15
 #Generate closer tiles dynamically?
 
-TILEPATH = "l12"
-os.makedirs(TILEPATH, exist_ok=True)
+#TILEPATH = "l12"
+#os.makedirs(TILEPATH, exist_ok=True)
 
 black = Image.new("RGB", (256, 256))
 
@@ -41,22 +42,25 @@ def generateMeta(zoom, x, y):
 	for index in points:
 		scale = scalelist[index]
 		if scale > 10:
-			meta.append({"text":valuelist[index], "value":keylist[index], "scale":scale})
+			meta.append({"text":valuelist[index], "value":keylist[index], "scale":scale, "x":x, "y":y, "z":zoom})
 
 	return meta
 
+DRAWALL = False
+DRAWLIMIT = 1000
+
 def generateTile(zoom, x, y):
+
 
 	zoomFactor,tw,th,tr,tx,ty = tileCoords(zoom, x, y)
 
 	#print(tx, ty, tw, th, tr)
 	points = tree.query_ball_point([(tx+tw/2, ty+th/2)], tr)[0]
 
+	tilefilename = f"{zoom}|{x}|{y}.png"
 
-	tilefilename = f"{zoom}-{x}-{y}.png"
+	tilepath = os.path.join(TILECACHE, tilefilename)
 	"""
-	tilepath = os.path.join(TILEPATH, tilefilename)
-
 	if len(points) == 0:
 		black.save(tilepath)
 		print("Generated", tilefilename, len(points))
@@ -66,6 +70,11 @@ def generateTile(zoom, x, y):
 	tile = Image.new("RGB", (256, 256))
 	draw = ImageDraw.Draw(tile)
 
+	draws = 0
+
+	largest_scale = 0
+	largest_index = None
+
 	for index in points:
 		px, py = keylist[index]
 		#print(px, py)
@@ -74,6 +83,19 @@ def generateTile(zoom, x, y):
 			ry = (py-ty)*(zoomFactor/2**7)
 
 			scale = scalelist[index]
+
+			if not DRAWALL and len(points) > DRAWLIMIT and scale < 100:
+				continue
+
+			if not DRAWALL and draws > DRAWLIMIT:
+				break
+
+			if scale > largest_scale:
+				largest_scale = scale
+				largest_index = index
+
+			draws += 1
+
 			scale = 5*log(1+scale, 10)
 			#scale = max(0, scale)
 			#print("R", rx, ry)
@@ -81,13 +103,18 @@ def generateTile(zoom, x, y):
 			point = (int(rx), int(ry))
 
 			if zoom >= 14:
-				draw.ellipse([int(rx-scale), int(ry-scale), int(rx+scale), int(ry+scale)], fill=(200,200,200))
+				draw.ellipse([int(rx-scale), int(ry-scale), int(rx+scale), int(ry+scale)], fill=(100,100,000))
 				draw.text(point, valuelist[index], font=large(10))
 			else:
 				tile.putpixel(point, (200,200,200))
 
+	if largest_index and zoom < 13:
+		draw.text((100, 128), valuelist[largest_index], font=large(12), fill=(200, 200, 50))
+
 	print("Generated", tilefilename, len(points))
 	#XXX save/cache tiles here anyway? not sure what is better, faster request or cached regions tile.save(tilepath)
+	if zoom < 8:
+		tile.save(tilepath)
 	return tile
 
 if __name__ == "__main__":

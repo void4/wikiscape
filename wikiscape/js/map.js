@@ -1,4 +1,10 @@
-var po = org.polymaps;
+var map = L.map('map').setView([45, -45], 12);
+
+L.tileLayer("tiles/{z}|{x}|{y}.png", {
+  maxZoom: 16,
+  tileSize: 256,
+  zoomOffset: -1
+}).addTo(map);
 
 var div = document.getElementById("map");
 
@@ -12,20 +18,6 @@ function getTile(c) {
   //console.log(url)
   return url;
 }
-
-var layer = po.image().url(getTile);
-
-var map = po.map()
-    .container(div.appendChild(po.svg("svg")))
-    .zoomRange([0,15])
-    .zoom(13)//XXX 1
-    .add(layer);
-    //.add(textLayer());
-          //.tileSize({x: 256, y: 256});
-
-
-map.add(po.interact())
-.add(po.hash());
 
 function textLayer() {
   var layer = po.layer(load);
@@ -56,7 +48,8 @@ function textLayer() {
         }
 
       function transform(d) {
-        d = projection({lon: d.value[0], lat: d.value[1]});
+        var latlon = xy2coords(d.x, d.y, d.z);
+        d = projection({lon: latlon.lon, lat: latlon.lat});
         return "translate(" + d.x + "," + d.y + ")";
       }
 
@@ -69,7 +62,7 @@ function textLayer() {
 
 map.on("move", function() {
   // get the current zoom
-  var z = map.zoom();
+  //var z = map.zoom();
   // show/hide parcels
   //parcels.visible(z >= 16);
   //console.log(z)
@@ -84,26 +77,31 @@ $(div).mousedown(function(e) {
 var originalWidth = 32768;
 var originalHeight = 32768;
 
+var tilesize = 256
+
+// todo use locate for exploration?
+
+const latlngToTilePixel = (latlng, crs, zoom, tileSize, pixelOrigin) => {
+    const layerPoint = crs.latLngToPoint(latlng, zoom).floor()
+    const tile = layerPoint.divideBy(tileSize).floor()
+    const tileCorner = tile.multiplyBy(tileSize).subtract(pixelOrigin)
+    const tilePixel = layerPoint.subtract(pixelOrigin).subtract(tileCorner)
+
+    return [tile, tilePixel]
+}
+
+
 $(div).mouseup(function(e) {
 
   // prevent drag actions from opening links
   if (e.clientX == lastmouse.clientX && e.clientY == lastmouse.clientY) {
 
-    // Get column, row and zoom level of mouse position
-    var crz = map.locationCoordinate(map.pointLocation(map.mouse(e)));
+    var latlon = map.mouseEventToLatLng(e);
+    console.log(latlon)
+    var coords = latlngToTilePixel(latlon, map.options.crs, map.getZoom(), tilesize, map.getPixelOrigin())
+    var mx = (coords[0].x*tilesize+coords[1].x)/Math.pow(2, map.getZoom()-1)/256*originalWidth;
+    var my = (coords[0].y*tilesize+coords[1].y)/Math.pow(2, map.getZoom()-1)/256*originalHeight;
 
-    // Normalize the column and row values to the 0..1 range
-    var zoomMultiplier = Math.pow(2, crz.zoom-1);
-
-    var x01 = crz.column/zoomMultiplier;
-    var y01 = crz.row/zoomMultiplier;
-
-    // Multiply with the original image width and height
-    var mx = x01*originalWidth;
-    var my = y01*originalHeight;
-
-    // Now we have the mouse coordinates on the original image!
-    //console.log(mx, my);
 
 	console.log(mx, my);
 
