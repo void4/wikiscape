@@ -46,7 +46,7 @@ def generateMeta(zoom, x, y):
 
 	return meta
 
-DRAWALL = False
+DRAWALL = True
 DRAWLIMIT = 1000
 
 def generateTile(zoom, x, y):
@@ -102,23 +102,28 @@ def generateTile(zoom, x, y):
 			#print(px, py)
 			point = (int(rx), int(ry))
 
-			if zoom >= 14:
+			if zoom >= 13:
 				draw.ellipse([int(rx-scale), int(ry-scale), int(rx+scale), int(ry+scale)], fill=(100,100,000))
 				draw.text(point, valuelist[index], font=large(10))
 			else:
-				tile.putpixel(point, (200,200,200))
+				if zoom >= 11:
+					v = 200
+				else:
+					pix = tile.getpixel(point)
+					v = min(255, pix[0]+32)
+				tile.putpixel(point, (v,v,v))
 
 	if largest_index and zoom < 13:
 		draw.text((100, 128), valuelist[largest_index], font=large(12), fill=(200, 200, 50))
 
 	print("Generated", tilefilename, len(points))
 	#XXX save/cache tiles here anyway? not sure what is better, faster request or cached regions tile.save(tilepath)
-	if zoom < 8:
+	if zoom < 12:
 		tile.save(tilepath)
 	return tile
 
 if __name__ == "__main__":
-	for z in range(12, 13):
-		for x in range(1274, 2**(z-1)):
+	for z in range(11, 12):
+		for x in range(2**(z-1)):
 			for y in range(2**(z-1)):
 				generateTile(z, x, y)

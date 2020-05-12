@@ -38,7 +38,7 @@ def send_tiles(path):
 
 	#z += 1
 	#11
-	if not ((1 < z < 16) and (0 < x < 2**(z-1)) and (0 < y < 2**(z-1))):#XXX z-1?
+	if not ((1 < z < 17) and (0 < x < 2**(z-1)) and (0 < y < 2**(z-1))):#XXX z-1?
 		abort(404)
 
 	tile = generateTile(z, x, y)
