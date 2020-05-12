@@ -78,41 +78,44 @@ def generateTile(zoom, x, y):
 	for index in points:
 		px, py = keylist[index]
 		#print(px, py)
-		if (tx <= px < tx+tw) and (ty <= py < ty+th):
-			rx = (px-tx)*(zoomFactor/2**7)
-			ry = (py-ty)*(zoomFactor/2**7)
+		#if (tx <= px < tx+tw) and (ty <= py < ty+th):
+		rx = (px-tx)*(zoomFactor/2**7)
+		ry = (py-ty)*(zoomFactor/2**7)
 
-			scale = scalelist[index]
+		scale = scalelist[index]
 
-			if not DRAWALL and len(points) > DRAWLIMIT and scale < 100:
-				continue
+		if not DRAWALL and len(points) > DRAWLIMIT and scale < 100:
+			continue
 
-			if not DRAWALL and draws > DRAWLIMIT:
-				break
+		if not DRAWALL and draws > DRAWLIMIT:
+			break
 
-			if scale > largest_scale:
-				largest_scale = scale
-				largest_index = index
+		if scale > largest_scale:
+			largest_scale = scale
+			largest_index = index
 
-			draws += 1
+		draws += 1
 
-			scale = 5*log(1+scale, 10)
-			#scale = max(0, scale)
-			#print("R", rx, ry)
-			#print(px, py)
-			point = (int(rx), int(ry))
+		scale = 5*log(1+scale, 10)
+		#scale = max(0, scale)
+		#print("R", rx, ry)
+		#print(px, py)
+		point = (int(rx), int(ry))
 
-			if zoom >= 13:
-				draw.ellipse([int(rx-scale), int(ry-scale), int(rx+scale), int(ry+scale)], fill=(100,100,000))
-				draw.text(point, valuelist[index], font=large(10))
+		if zoom >= 13:
+			draw.ellipse([int(rx-scale), int(ry-scale), int(rx+scale), int(ry+scale)], fill=(100,100,000))
+			draw.text(point, valuelist[index], font=large(12))
+		else:
+			if zoom >= 11:
+				v = 200
 			else:
-				if zoom >= 11:
-					v = 200
-				else:
-					pix = tile.getpixel(point)
-					v = min(255, pix[0]+32)
+				pix = tile.getpixel(point)
+				v = min(255, pix[0]+32)
+			
+			try:
 				tile.putpixel(point, (v,v,v))
-
+			except IndexError:
+				pass
 	if largest_index and zoom < 13:
 		draw.text((100, 128), valuelist[largest_index], font=large(12), fill=(200, 200, 50))
 
